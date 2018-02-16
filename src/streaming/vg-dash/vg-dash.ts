@@ -12,6 +12,7 @@ export class VgDASH implements OnInit, OnChanges, OnDestroy {
     @Input() vgDash:string;
     @Input() vgDRMToken:string;
     @Input() vgDRMLicenseServer:IDRMLicenseServer;
+    @Input() vgJwtToken: string;
 
     vgFor: string;
     target: any;
@@ -66,12 +67,30 @@ export class VgDASH implements OnInit, OnChanges, OnDestroy {
                     }
                 }
             }
-
+            
             this.dash = dashjs.MediaPlayer().create();
             this.dash.getDebug().setLogToBrowserConsole(false);
             this.dash.initialize(this.ref.nativeElement);
             this.dash.setAutoPlay(false);
-
+            
+            // set JWT Token Header if present
+            // solution first posted on github:
+            // https://github.com/Dash-Industry-Forum/dash.js/issues/1471#issuecomment-229291235
+            if (this.vgJwtToken) {
+                this.dash.extend("RequestModifier", () => {
+                    return {
+                        modifyRequestHeader: xhr => {
+                            xhr.setRequestHeader('Authorization', `Bearer ${this.vgJwtToken}`);
+                            return xhr;
+                        },
+                        modifyRequestURL: url => {
+                            return url;
+                        }
+                    };
+                },
+                true
+            );
+            };
             if (drmOptions) {
                 this.dash.setProtectionData(drmOptions);
             }

@@ -44,11 +44,15 @@ export class VgHLS implements OnInit, OnChanges, OnDestroy {
 
         if (this.crossorigin === 'use-credentials') {
             this.config.xhrSetup = (xhr, url) => {
-                // set JWT Token Header if present
-                if (this.vgJwtToken) {
-                    xhr.setRequestHeader('Authorization', `Bearer ${this.vgJwtToken}`)
-                }
                 // Send cookies
+                xhr.withCredentials = true;
+            };
+        }
+        // set JWT Token Header if present
+        // note that this get's not triggered on iOS devices since they use the native hls engine
+        if (this.vgJwtToken) {
+            this.config.xhrSetup = (xhr, url) => {                    
+                xhr.setRequestHeader('Authorization', 'Bearer ' + this.vgJwtToken);
                 xhr.withCredentials = true;
             };
         }

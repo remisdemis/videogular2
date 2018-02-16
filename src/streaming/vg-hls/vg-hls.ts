@@ -10,6 +10,7 @@ declare let Hls;
 })
 export class VgHLS implements OnInit, OnChanges, OnDestroy {
     @Input() vgHls:string;
+    @Input() vgJwtToken: string;
 
     vgFor: string;
     target: any;
@@ -43,6 +44,10 @@ export class VgHLS implements OnInit, OnChanges, OnDestroy {
 
         if (this.crossorigin === 'use-credentials') {
             this.config.xhrSetup = (xhr, url) => {
+                // set JWT Token Header if present
+                if (this.vgJwtToken) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${this.vgJwtToken}`)
+                }
                 // Send cookies
                 xhr.withCredentials = true;
             };
